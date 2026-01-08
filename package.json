@@ -1,18 +1,4 @@
 {
-<<<<<<< HEAD
-  "scripts": {
-    "start": "node index.js"
-  },
-  "dependencies": {
-    "axios": "^1.13.2",
-    "express": "^5.2.1",
-    "mongodb": "^7.0.0",
-    "mongoose": "^9.1.1"
-  },
-  "devDependencies": {
-    "jest": "^30.2.0",
-    "supertest": "^7.1.4"
-=======
   "name": "caki-backend",
   "version": "1.0.0",
   "main": "index.js",
@@ -25,12 +11,17 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.1",
     "cors": "^2.8.5",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "mongodb": "^7.0.0",
     "mongoose": "^9.1.1"
->>>>>>> 96782aac41967cf67eb689c701cbcc58e977b167
+  },
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
   }
 }
