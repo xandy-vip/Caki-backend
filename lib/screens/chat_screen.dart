@@ -31,7 +31,7 @@ class _ChatScreenState extends State<ChatScreen> {
       final token = AuthService().token;
       final res = await http.post(
         Uri.parse(
-            'http://localhost:3000/rooms/${room!['id'] ?? room!['_id']}/messages'),
+            'https://caki-backend.onrender.com/rooms/${room!['id'] ?? room!['_id']}/messages'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': token != null ? 'Bearer $token' : ''
@@ -119,7 +119,7 @@ class _ChatScreenState extends State<ChatScreen> {
       final token = AuthService().token;
       final res = await http.get(
         Uri.parse(
-            'http://localhost:3000/rooms/${room!['id'] ?? room!['_id']}/messages'),
+            'https://caki-backend.onrender.com/rooms/${room!['id'] ?? room!['_id']}/messages'),
         headers: {'Authorization': token != null ? 'Bearer $token' : ''},
       );
       if (res.statusCode == 200) {

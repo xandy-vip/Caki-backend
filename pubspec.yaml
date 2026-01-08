@@ -1,10 +1,10 @@
-name: caki_flutter
+name: caki
 
 description: Projeto Flutter para integração com backend Caki
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.1+6
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
@@ -18,6 +18,7 @@ dependencies:
   firebase_auth: ^6.1.3
   google_sign_in: ^5.4.4
   cloud_firestore: ^6.1.1
+  socket_io_client: ^3.1.3
 
 dev_dependencies:
   flutter_test:

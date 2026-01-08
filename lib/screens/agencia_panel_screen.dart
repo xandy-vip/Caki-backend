@@ -4,34 +4,83 @@ class AgenciaPanelScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Painel do Agente')),
+      appBar: AppBar(
+        title: const Text('Painel do Agente'),
+        backgroundColor: Colors.deepPurple,
+        centerTitle: true,
+        elevation: 2,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Escolha uma opção:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                // Navegar para tela de escolha de agência
-              },
-              child: Text('Entrar em uma agência como Host'),
+            const Text(
+              'Escolha uma opção:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
-            SizedBox(height: 16),
-            ElevatedButton(
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.meeting_room, color: Colors.white),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () {
+                // Navegar para tela de escolha de agência como Host
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EscolherAgenciaHostScreen(),
+                  ),
+                );
+              },
+              label: const Text('Entrar em uma agência como Host',
+                  style: TextStyle(fontSize: 16)),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.business, color: Colors.white),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => CadastroAgenciaScreen()),
+                    builder: (context) => CadastroAgenciaScreen(),
+                  ),
                 );
               },
-              child: Text('Abrir minha agência'),
+              label: const Text('Abrir minha agência',
+                  style: TextStyle(fontSize: 16)),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class EscolherAgenciaHostScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Escolher Agência'),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: Center(
+        child: Text('Tela de escolha de agência como Host (em breve)',
+            style: TextStyle(fontSize: 18)),
       ),
     );
   }
@@ -49,43 +98,66 @@ class _CadastroAgenciaScreenState extends State<CadastroAgenciaScreen> {
   final TextEditingController _cidadeController = TextEditingController();
   String? _docFrente;
   String? _docVerso;
+  bool _loading = false;
+  String? _error;
+  String? _success;
 
   void _pickDoc(bool frente) async {
-    // Aqui você pode implementar o picker de imagem
-    // Exemplo: usando image_picker ou similar
+    // TODO: Implementar picker de imagem
+    setState(() {
+      if (frente) {
+        _docFrente = 'frente.png';
+      } else {
+        _docVerso = 'verso.png';
+      }
+    });
   }
 
-  void _submit() {
-    // Aqui você pode enviar os dados para o backend
-    // Gerar ID da agência (exemplo: random ou sequencial)
-    Navigator.pop(context);
+  void _submit() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+      _success = null;
+    });
+    await Future.delayed(const Duration(seconds: 2)); // Simula envio
+    setState(() {
+      _loading = false;
+      _success = 'Agência cadastrada com sucesso!';
+    });
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pop(context);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Cadastro de Agência')),
+      appBar: AppBar(
+        title: const Text('Cadastro de Agência'),
+        backgroundColor: Colors.purple,
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
             TextField(
               controller: _nomeController,
-              decoration: InputDecoration(labelText: 'Nome da agência'),
+              decoration: const InputDecoration(labelText: 'Nome da agência'),
             ),
             TextField(
               controller: _whatsController,
-              decoration: InputDecoration(labelText: 'WhatsApp'),
+              decoration: const InputDecoration(labelText: 'WhatsApp'),
+              keyboardType: TextInputType.phone,
             ),
             TextField(
               controller: _paisController,
-              decoration: InputDecoration(labelText: 'País'),
+              decoration: const InputDecoration(labelText: 'País'),
             ),
             TextField(
               controller: _cidadeController,
-              decoration: InputDecoration(labelText: 'Cidade'),
+              decoration: const InputDecoration(labelText: 'Cidade'),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
@@ -95,7 +167,7 @@ class _CadastroAgenciaScreenState extends State<CadastroAgenciaScreen> {
                         _docFrente == null ? 'Documento Frente' : 'Frente OK'),
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () => _pickDoc(false),
@@ -105,10 +177,26 @@ class _CadastroAgenciaScreenState extends State<CadastroAgenciaScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _submit,
-              child: Text('Cadastrar Agência'),
+            const SizedBox(height: 24),
+            if (_error != null)
+              Text(_error!, style: const TextStyle(color: Colors.red)),
+            if (_success != null)
+              Text(_success!, style: const TextStyle(color: Colors.green)),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _loading ? null : _submit,
+                child: _loading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('Cadastrar Agência'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
             ),
           ],
         ),

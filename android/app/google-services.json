@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "154926205994-5ttpiev1mutnghuph3rkkcf6rue9klhu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.caki.app",
+            "certificate_hash": "a56e040cd365860dafe9b24c6b0d4ee43a5487d6"
+          }
+        },
+        {
           "client_id": "154926205994-1c6ic0dc3a85on76c3rj41o26bfb98gb.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +37,13 @@
             {
               "client_id": "154926205994-1c6ic0dc3a85on76c3rj41o26bfb98gb.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "154926205994-g3ol5sa9vpspqcktmstbumnjeegj4t45.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cakiFlutter"
+              }
             }
           ]
         }
@@ -74,6 +89,13 @@
             {
               "client_id": "154926205994-1c6ic0dc3a85on76c3rj41o26bfb98gb.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "154926205994-g3ol5sa9vpspqcktmstbumnjeegj4t45.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cakiFlutter"
+              }
             }
           ]
         }

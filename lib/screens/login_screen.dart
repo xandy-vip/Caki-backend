@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _loading = true;
       _error = null;
     });
-    final url = Uri.parse('http://localhost:3000/auth/login');
+    final url = Uri.parse('https://caki-backend.onrender.com/auth/login');
     try {
       final res = await http.post(
         url,
@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _loading = true;
       _error = null;
     });
-    final url = Uri.parse('http://localhost:3000/auth/register');
+    final url = Uri.parse('https://caki-backend.onrender.com/auth/register');
     try {
       final res = await http.post(
         url,

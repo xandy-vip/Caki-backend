@@ -4,7 +4,8 @@ import '../models/room_trophy.dart';
 
 class RoomRankService {
   Future<RoomRank> fetchRoomRank(String roomId) async {
-    final url = Uri.parse('http://localhost:3000/rooms/$roomId/rank');
+    final url =
+        Uri.parse('https://caki-backend.onrender.com/rooms/$roomId/rank');
     final res = await http.get(url);
     if (res.statusCode == 200) {
       final data = jsonDecode(res.body);

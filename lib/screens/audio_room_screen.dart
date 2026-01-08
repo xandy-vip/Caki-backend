@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 // import 'package:flutter_auto_echo_cancellation_websocket/flutter_auto_echo_cancellation_websocket.dart';
 // import 'package:chat_flutter/chat_flutter.dart';
 
@@ -12,10 +13,115 @@ class AudioRoomScreen extends StatefulWidget {
 
 class _AudioRoomScreenState extends State<AudioRoomScreen>
     with SingleTickerProviderStateMixin {
+  late IO.Socket socket;
+
   // Estado para "cadeira" (usuário é speaker ou não)
   bool _isOnChair = false;
 
   late TabController _tabController;
+
+  bool _socketConnected = false;
+  bool _socketConnecting = true;
+  String? _socketError;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _initSocket();
+  }
+
+  void _initSocket() {
+    // Altere a URL para o endereço do seu backend
+    socket = IO.io('http://localhost:3000', <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+    });
+    socket.connect();
+
+    setState(() {
+      _socketConnecting = true;
+      _socketConnected = false;
+      _socketError = null;
+    });
+
+    socket.onConnect((_) {
+      print('Conectado ao Socket.IO');
+      setState(() {
+        _socketConnected = true;
+        _socketConnecting = false;
+        _socketError = null;
+      });
+      // Exemplo: entrar na sala
+      socket
+          .emit('joinRoom', {'roomId': widget.roomName, 'userId': 'meuUserId'});
+    });
+
+    socket.onDisconnect((_) {
+      print('Desconectado do Socket.IO');
+      setState(() {
+        _socketConnected = false;
+        _socketConnecting = false;
+      });
+    });
+
+    socket.onConnectError((err) {
+      print('Erro de conexão Socket.IO: $err');
+      setState(() {
+        _socketConnected = false;
+        _socketConnecting = false;
+        _socketError = err.toString();
+      });
+    });
+
+    socket.onError((err) {
+      print('Erro Socket.IO: $err');
+      setState(() {
+        _socketConnected = false;
+        _socketConnecting = false;
+        _socketError = err.toString();
+      });
+    });
+
+    socket.on('newMessage', (data) {
+      print('Nova mensagem: $data');
+      setState(() {
+        if (data is Map<String, dynamic>) {
+          _messages.add(data);
+        } else if (data is Map) {
+          _messages.add(Map<String, dynamic>.from(data));
+        } else {
+          _messages
+              .add({'user': 'Outro', 'text': data.toString(), 'type': 'text'});
+        }
+      });
+    });
+
+    socket.on('micUpdated', (data) {
+      print('Microfone atualizado: $data');
+    });
+
+    socket.on('presentSent', (data) {
+      print('Presente recebido: $data');
+    });
+
+    socket.on('userJoined', (data) {
+      print('Usuário entrou: $data');
+    });
+
+    socket.on('userLeft', (data) {
+      print('Usuário saiu: $data');
+    });
+
+    // Adicione outros listeners conforme necessário
+  }
+
+  @override
+  void dispose() {
+    socket.dispose();
+    _tabController.dispose();
+    super.dispose();
+  }
 
   // Função para jogar presente para si mesmo
   void _sendGiftToSelf() {
@@ -57,28 +163,23 @@ class _AudioRoomScreenState extends State<AudioRoomScreen>
   final List<Map<String, dynamic>> _messages = [];
   final TextEditingController _controller = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _tabController.dispose();
-    super.dispose();
-  }
+  // (Removido: métodos duplicados de initState e dispose)
 
   void _sendMessage() {
     if (_controller.text.trim().isEmpty) return;
+    final msg = {
+      'user': 'Você',
+      'text': _controller.text.trim(),
+      'type': 'text',
+    };
     setState(() {
-      _messages.add({
-        'user': 'Você',
-        'text': _controller.text.trim(),
-        'type': 'text',
-      });
+      _messages.add(msg);
       _controller.clear();
+    });
+    // Envia para o backend via Socket.IO
+    socket.emit('sendMessage', {
+      'roomId': widget.roomName,
+      'message': msg,
     });
   }
 
@@ -96,7 +197,25 @@ class _AudioRoomScreenState extends State<AudioRoomScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.roomName),
+        title: Row(
+          children: [
+            Text(widget.roomName),
+            SizedBox(width: 12),
+            if (_socketConnecting)
+              SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.amber),
+                ),
+              )
+            else if (_socketConnected)
+              Icon(Icons.circle, color: Colors.green, size: 16)
+            else
+              Icon(Icons.circle, color: Colors.red, size: 16),
+          ],
+        ),
         backgroundColor: Colors.brown[900],
         bottom: TabBar(
           controller: _tabController,
@@ -109,6 +228,24 @@ class _AudioRoomScreenState extends State<AudioRoomScreen>
       backgroundColor: Color(0xFF1A1207),
       body: Column(
         children: [
+          if (_socketError != null)
+            Container(
+              color: Colors.red[900],
+              width: double.infinity,
+              padding: EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  Icon(Icons.error, color: Colors.white),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Erro de conexão: $_socketError',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           // Espaço para participantes com microfone
           Container(
             height: 120,
